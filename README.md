@@ -74,7 +74,7 @@ Table 1: Comparison of performances on different K treatments, measured by WPEHE
 
 Table 2: Zero-shot evaluation compared to treatment-specific models, measured by ePEHE and $e$ATE.
 <div align="center">
-<img src="https://github.com/user-attachments/assets/955cbd6c-767e-455c-9ae2-b12081f0b22f" width="300px">
+<img src="https://github.com/user-attachments/assets/955cbd6c-767e-455c-9ae2-b12081f0b22f" width="350px">
 </div>
 
 
