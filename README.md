@@ -80,13 +80,13 @@ Table 2: Zero-shot evaluation compared to treatment-specific models, measured by
 Figure 1: Comparison of chemical similarity (left) and model weight similarity (right). Brighter
 values indicate higher similarity.
 <div align="center">
-<img src="https://github.com/user-attachments/assets/ea3c3add-7577-4d73-b6b3-5e869eba6a92" width="350px">
+<img src="https://github.com/user-attachments/assets/ea3c3add-7577-4d73-b6b3-5e869eba6a92" width="600px">
 </div>
 
 Figure 2: CATE estimation performance under varying ratios of training treatment used, reported as
 WPEHE@6 for both in-sample and out-of-sample tests.
 <div align="center">
-<img src="https://github.com/user-attachments/assets/dca76834-4299-4c4e-963d-e9d9b21f9a68" width="350px">
+<img src="https://github.com/user-attachments/assets/dca76834-4299-4c4e-963d-e9d9b21f9a68" width="600px">
 </div>
 
 
