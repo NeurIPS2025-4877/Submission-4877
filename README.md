@@ -28,23 +28,25 @@ pip install -r requirements.txt
 ## Data preparation
 ### Preprocessing datasets
 
-This command will preprocess CCLE or GDSC datasets. 
+To preprocess the CCLE or GDSC datasets, run:
 ```python 
-python generate_data_ccle.py --data 'GDSC'
+python preprocess/generate_data_ccle.py --data 'GDSC'
 ```
 >
-* `data`: dataset to use; {'CCLE', 'GDSC'}.
+* `data`: specifies the dataset to preprocess. Options are 'CCLE' or 'GDSC'.
 
-This command will preprocess TCGA dataset. 
+To preprocess the TCGA dataset, run:
 ```python 
-python generate_data_tcga.py 
+python preprocess/generate_data_tcga.py 
 ```
+
+All preprocessed datasets will be saved in the generated_data/ directory.
 
 ---
 
 ## Training and test
 ### Python command
-For training and evaluating the model, run the following code
+For training and evaluating the model, run the following code:
 ```python 
 # Note 1: hyper-parameters are included in config.json.
 python train.py --data 'TCGA'
@@ -54,23 +56,33 @@ python train.py --data 'TCGA'
 Hyper-parameters are set in train.py
 >
 * `data`: dataset to use; {'TCGA', 'CCLE', 'GDSC'}.
-* `config`: .json file
 
 Hyper-parameters are set in *.json
+
+**data_loader**
 >
-* `train_ratio`: the ratio of training
+* `path_to_train`: path to the training data
+* `path_to_test`: path to the test data
+* `valid_ratio`: the ratio of validation
+
+**hyper_params**
+>
 * `drug_n_dims`: the hidden dimension of the treatment embedding layers.
 * `drug_n_layers`: the number of layers in the treatment embedding.
 * `feat_n_dims`: the hidden dimension of the covariate embedding layers.
 * `feat_n_layers`: the number of layers in the covariate embedding.
 * `pred_n_dims`: the hidden dimension of the prediction layers.
 * `pred_n_layers`: the number of layers in the prediction layers.
+* `min_test_assignments`: minimum number of K.
+* `max_test_assignments`: maximum number of K.
+_* Note: Additional hyperparameters are defined for configuring the graph neural network modules, and are not listed here._
+
+**metrics and trainer**
+>
 * `metrics`: metrics to print out. It is a list format. Functions for all metrics should be included in 'model/metric.py'.
 * `early_stop`: the number of epochs for early stopping
 * `monitor`: the criterion for early stopping. The first word is 'min' or 'max', and the second one is metric.
 
-
-_* Experiments were conducted using a computing cluster consisting of 42 nodes, each equipped with dual Intel Xeon 8268 processors, 384GB RAM, and dual NVIDIA Volta V100 GPUs with 32GB memory._
 
 
 ## Results
