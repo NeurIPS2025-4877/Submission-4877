@@ -22,14 +22,14 @@ pip install -r requirements.txt
 
 To preprocess the CCLE or GDSC datasets, move to the "preprocess/" directory and run:
 ```python 
-python preprocess/generate_data_ccle.py --data 'GDSC'
+python generate_data_ccle.py --data 'GDSC'
 ```
 >
 * `data`: specifies the dataset to preprocess. Options are 'CCLE' or 'GDSC'.
 
 To preprocess the TCGA dataset, move to the "preprocess/" directory and run:
 ```python 
-python preprocess/generate_data_tcga.py 
+python generate_data_tcga.py 
 ```
 
 All preprocessed datasets will be saved in the "generated_data/" directory.
