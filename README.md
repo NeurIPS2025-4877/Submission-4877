@@ -66,17 +66,16 @@ _* Experiments were conducted using a computing cluster consisting of 42 nodes, 
 
 
 ## Results
-<div align="center">
-<img src="https://github.com/user-attachments/assets/434962fc-5779-48c3-9517-93b418b4b40b" width="650px">
-</div>
 Table 1: Comparison of performances on different K treatments, measured by WPEHE@K.
-
-
-
 <div align="center">
-<img src="https://github.com/user-attachments/assets/955cbd6c-767e-455c-9ae2-b12081f0b22f" width="450px">
+<img src="https://github.com/user-attachments/assets/434962fc-5779-48c3-9517-93b418b4b40b" width="600px">
 </div>
+
+
 Table 2: Zero-shot evaluation compared to treatment-specific models, measured by ePEHE and $e$ATE.
+<div align="center">
+<img src="https://github.com/user-attachments/assets/955cbd6c-767e-455c-9ae2-b12081f0b22f" width="300px">
+</div>
 
 
 
