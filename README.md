@@ -5,7 +5,7 @@ This repository contains source code for the NeurIPS 2025 submission paper "Trea
 
 Real-world data provide a valuable resource for estimating conditional average treatment effects (CATE), a key task in personalized medicine. However, limited data availability—especially for rare or newly introduced treatments—poses challenges for reliable and generalizable estimation. This motivates the need for a unified modeling approach that generalizes across multiple treatments. While existing studies leverage treatment information for unified modeling, most rely on a shared architecture across all treatments, which fails to capture treatment-specific covariate relevance and interaction effects. We propose HyperTE, a novel treatment-conditioned hypernetwork framework for CATE estimation that explicitly models treatment–specific covariate interactions and their effects on outcomes. HyperTE leverages treatment attributes to generate the weights of an interaction model via a hypernetwork, enabling covariate representations to be dynamically conditioned on treatment properties. It supports flexible treatment-specific modeling while facilitating knowledge sharing across treatments, enhancing generalization to rare or unseen treatments. To address confounding in the presence of treatment–covariate interactions, we introduce a double-adjustment that decomposes the effects of covariates and interactions for robust causal inference. Extensive experiments demonstrate the effectiveness of our framework in estimating CATE across diverse treatments and generalizing to previously unseen treatments. 
 
----
+
 
 ## Overview
 ![image](https://github.com/user-attachments/assets/99212a16-0549-483e-bcaa-10c222001d20)
@@ -79,7 +79,7 @@ _Note: Additional hyperparameters are defined for configuring the graph neural n
 * `early_stop`: the number of epochs for early stopping
 * `monitor`: the criterion for early stopping. The first word is 'min' or 'max', and the second one is metric.
 
-
+---
 
 ## Results
 Table 1: Comparison of performances on different K treatments, measured by WPEHE@K.
