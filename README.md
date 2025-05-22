@@ -53,19 +53,19 @@ python train.py --data 'TCGA'
 ```
   
 ### Parameters
-Hyper-parameters are set in train.py
+**Hyper-parameters are set in train.py**
 >
 * `data`: dataset to use; {'TCGA', 'CCLE', 'GDSC'}.
 
-Hyper-parameters are set in *.json
+**Hyper-parameters are set in *.json**
 
-**data_loader**
+data_loader
 >
 * `path_to_train`: path to the training data
 * `path_to_test`: path to the test data
 * `valid_ratio`: the ratio of validation
 
-**hyper_params**
+hyper_params
 >
 * `drug_n_dims`: the hidden dimension of the treatment embedding layers.
 * `drug_n_layers`: the number of layers in the treatment embedding.
@@ -75,9 +75,10 @@ Hyper-parameters are set in *.json
 * `pred_n_layers`: the number of layers in the prediction layers.
 * `min_test_assignments`: minimum number of K.
 * `max_test_assignments`: maximum number of K.
+
 _* Note: Additional hyperparameters are defined for configuring the graph neural network modules, and are not listed here._
 
-**metrics and trainer**
+metrics and trainer
 >
 * `metrics`: metrics to print out. It is a list format. Functions for all metrics should be included in 'model/metric.py'.
 * `early_stop`: the number of epochs for early stopping
