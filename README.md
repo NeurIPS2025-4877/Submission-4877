@@ -13,13 +13,6 @@ Figure 1: Overview of the study problem. (a) Each individual has covariates (X),
 
 
 ## Installation
-Our model depends on Numpy, and PyTorch (CUDA toolkit if use GPU). You must have them installed before using our model
->
-* Python 3.9
-* Pytorch 1.10.2
-* Numpy 1.21.2
-* Pandas 1.4.1
-
 This command will install all the required libraries and their specified versions.
 ```python 
 pip install -r requirements.txt
