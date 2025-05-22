@@ -26,10 +26,19 @@ pip install -r requirements.txt
 ```
 
 ## Data preparation
-### get datasets
-The downloadable version of the datasets used in the paper can be accessed in the 'simulation' folder. 
+### Preprocessing datasets
 
-_Note: ._
+This command will preprocess CCLE or GDSC datasets. 
+```python 
+python generate_data_ccle.py --data 'GDSC'
+```
+>
+* `data`: dataset to use; {'CCLE', 'GDSC'}.
+
+This command will preprocess TCGA dataset. 
+```python 
+python generate_data_tcga.py 
+```
 
 ---
 
@@ -38,8 +47,7 @@ _Note: ._
 For training and evaluating the model, run the following code
 ```python 
 # Note 1: hyper-parameters are included in config.json.
-# Note 2: the code simulates the data.
-python train.py --config 'config.json' --data 'TCGA'
+python train.py --data 'TCGA'
 ```
   
 ### Parameters
