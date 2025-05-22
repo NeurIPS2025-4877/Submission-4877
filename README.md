@@ -36,6 +36,9 @@ python generate_data_tcga.py
 
 All preprocessed datasets will be saved in the "generated_data/" directory.
 
+> **Note:** Due to file size limitations, the data files are not included in this code package.  
+> Please visit [https://github.com/NeurIPS2025-4877/Submission-4877](https://github.com/NeurIPS2025-4877/Submission-4877) to access the datasets.
+
 ---
 
 ## Training and test
