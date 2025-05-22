@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch_geometric.data import Data
 from typing import List
-from data.dataset import Dataset, create_pt_geometric_dataset
+from preprocessing.data.dataset import Dataset, create_pt_geometric_dataset
 
 def load_graph_dataset(config):
     data_info = config["data_loader"]

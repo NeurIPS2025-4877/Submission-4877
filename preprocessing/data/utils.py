@@ -29,27 +29,6 @@ def normalize_data(x: np.ndarray) -> np.ndarray:
     return x
 
 
-def split_train_val(
-    units: np.ndarray, graphs: List, outcomes: np.ndarray, args: argparse.Namespace
-) -> Tuple[Dict, Dict]:
-    num_train = len(units)
-    indices = list(range(num_train))
-    np.random.shuffle(indices)
-    split = int(np.floor(args.val_size * num_train))
-    train_idx, valid_idx = indices[split:], indices[:split]
-    train_data, val_data = {}, {}
-    train_data["units"], train_data["graphs"], train_data["outcomes"] = (
-        units[train_idx],
-        itemgetter(*train_idx)(graphs),
-        outcomes[train_idx],
-    )
-    val_data["units"], val_data["graphs"], val_data["outcomes"] = (
-        units[valid_idx],
-        itemgetter(*valid_idx)(graphs),
-        outcomes[valid_idx],
-    )
-    return train_data, val_data
-
 
 def get_treatment_graphs(treatment_ids: list, id_to_graph_dict: dict) -> List:
     return [id_to_graph_dict[i] for i in treatment_ids]
