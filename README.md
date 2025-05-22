@@ -19,7 +19,6 @@ pip install -r requirements.txt
 ```
 
 ## Data preparation
-### Preprocessing datasets
 
 To preprocess the CCLE or GDSC datasets, run:
 ```python 
