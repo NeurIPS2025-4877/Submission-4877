@@ -53,11 +53,11 @@ python train.py --data 'TCGA'
 ```
   
 ### Parameters
-**Hyper-parameters are set in train.py**
+**Hyperparameters are set in train.py**
 >
 * `data`: dataset to use; {'TCGA', 'CCLE', 'GDSC'}.
 
-**Hyper-parameters are set in *.json**
+**Hyperparameters are set in config.json**
 
 data_loader
 >
