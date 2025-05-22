@@ -16,7 +16,6 @@ class TreatmentFeatureExtractor(nn.Module):
         hparam = config['hyper_params']
         d_input_dim = hparam['d_input_dim']
         self.is_graph = (config['data_loader']['data_type'] == 'graph')
-        is_hyperTE = hparam['model'].startswith('HyperTE')
         
         if not self.is_graph:
             self.treatment_net = LinearNet(d_input_dim, hparam['drug_n_layers'], hparam['drug_n_dims'], 

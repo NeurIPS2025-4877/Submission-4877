@@ -3,8 +3,8 @@ import logging
 
 from tqdm import tqdm
 
-from data.tcga.qm9_tcga_simulation import fetch_all_raw_data
-from data.tcga.smiles_processing import smiles_to_graph
+from dataset.TCGA.qm9_tcga_simulation import fetch_all_raw_data
+from dataset.TCGA.smiles_processing import smiles_to_graph
 from data.utils import one_of_k_encoding
 
 

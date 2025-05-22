@@ -1,11 +1,9 @@
 {
     "n_gpu": 1,
     "data_loader": {
-        "path_to_train": "generated_data/ccle/seed-0/bias-1/in_sample.p",
-        "path_to_test": "generated_data/ccle/seed-0/bias-1/test.p",
-        "path_to_zero": "generated_data/ccle/zero/seed-0/",
+        "path_to_train": "generated_data/ccle/seed-7/bias-0.1/in_sample.p",
+        "path_to_test": "generated_data/ccle/seed-7/bias-0.1/test.p",
         "batch_size": 1000,
-        "train_ratio": 0.6,
         "valid_ratio": 0.2,
         "data_type": "graph"
     },
@@ -13,6 +11,12 @@
         "x_input_dim": 1037,
         "d_input_dim": 75,
         "n_drugs": 24,
+        "drug_n_dims": 50,
+        "drug_n_layers": 2,
+        "feat_n_dims": 50,
+        "feat_n_layers": 1,
+        "pred_n_dims": 50,
+        "pred_n_layers": 1,
         "gnn_conv": "graph_conv", 
         "gnn_num_relations": 4,
         "gnn_num_bases": -1,
@@ -31,7 +35,7 @@
     "optimizer": {
         "type": "Adam",
         "args":{
-            "lr": 0.0001
+            "lr": 0.001
         }
     },
     "metrics": [

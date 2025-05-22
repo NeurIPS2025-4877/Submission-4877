@@ -5,7 +5,6 @@ from utils import inf_loop, MetricTracker
 import torch.nn as nn
 import pandas as pd
 from torch_geometric.loader import DataLoader
-from model.utils.util import padding
 from torch_geometric.data.batch import Batch
 from typing import List
 from data.utils import get_treatment_graphs
@@ -52,7 +51,7 @@ class Trainer(BaseTrainer):
             loss += loss_dict['total_loss'].item()
         loss /= (index+1)
         
-        log = self._metrics_graph(
+        log = self._metrics(
             self.train_set, y_outs, loss
             )
         
@@ -100,8 +99,7 @@ class Trainer(BaseTrainer):
         self.logger.info('='*100)
         self.logger.info('Inference Completed')
         for key, value in log.items():
-            if 'test_6' in key:
-                self.logger.info(f'{key:20s}: {value}')
+            self.logger.info(f'{key:20s}: {value}')
         self.logger.info('='*100)
         return log
     
@@ -179,7 +177,7 @@ class Trainer(BaseTrainer):
                 
             log[f"{k}_UPEHE"] = np.mean(unweighted_errors_lst)
             log[f"{k}_WPEHE"] = np.mean(weighted_errors_lst)
-            log[f"{k}_ATE"] = np.mean(ate_errors_lst)
+            # log[f"{k}_ATE"] = np.mean(ate_errors_lst)
                 
         return log
     

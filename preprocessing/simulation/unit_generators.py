@@ -3,12 +3,12 @@ from typing import Tuple
 
 import numpy as np
 
-from data.tcga.qm9_tcga_simulation import (get_TCGA_pca_data,
+from dataset.TCGA.qm9_tcga_simulation import (get_TCGA_pca_data,
                                            get_TCGA_unit_features)
 
 
 def generate_TCGA_unit_features(args: Namespace) -> Tuple[dict, dict]:
-    tcga_data = get_TCGA_unit_features("./data/tcga/tcga.p")
+    tcga_data = get_TCGA_unit_features("./dataset/TCGA/tcga.p")
     tcga_pca_data = get_TCGA_pca_data(n_components=args.dim_pca_unit)
     all_indices = list(range(len(tcga_data)))
     np.random.shuffle(all_indices)
