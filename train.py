@@ -54,9 +54,25 @@ if __name__ == '__main__':
     params = args.parse_args()
 
 
-    exper_name = '{}/{}/{}_{}_{}_{}_{}_{}'.format(params.data, params.model, params.drug_n_dims, params.drug_n_layers, params.feat_n_dims, params.feat_n_layers, params.pred_n_dims, params.pred_n_layers)
+    exper_name = '{}/{}_{}_{}_{}_{}_{}'.format(params.data, params.drug_n_dims, params.drug_n_layers, params.feat_n_dims, params.feat_n_layers, params.pred_n_dims, params.pred_n_layers)
     config = ConfigParser.from_args(args, exper_name)
 
-    log = main(params, config, iter)
+    config, train_set, valid_set, test_set = load_graph_dataset(config)
+    
+    model = HyperTE(config, params)
+  
+    num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print("Number of trainable parameters: ", num_params)
+
+    metrics = [getattr(module_metric, met) for met in config['metrics']]
+
+    trainer = Trainer(model, 
+                      metrics,
+                      config,
+                      train_set,
+                      valid_set,
+                      test_set)
+    
+    trainer.train()
 
                         

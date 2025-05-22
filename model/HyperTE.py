@@ -50,23 +50,24 @@ class HyperBaseNet(nn.Module):
 
     
 class HyperTE(nn.Module):
-    def __init__(self, config, params):
+    def __init__(self, config):
         super(HyperTE, self).__init__()
-        self.x_input_dim = config['hyper_params']['x_input_dim']
+        hparam = config['hyper_params']
+        self.x_input_dim = hparam['x_input_dim']
         self.alpha = 0.1
         self.treatment_net = TreatmentFeatureExtractor(
-            config, params, 
+            config, 
         )  
-        self.mu_layer = nn.Linear(params.drug_n_dims, params.drug_n_dims)
-        self.logvar_layer = nn.Linear(params.drug_n_dims, params.drug_n_dims)    
+        self.mu_layer = nn.Linear(hparam['drug_n_dims'], hparam['drug_n_dims'])
+        self.logvar_layer = nn.Linear(hparam['drug_n_dims'], hparam['drug_n_dims'])    
                 
         self.feature_net = HyperBaseNet(
-            self.x_input_dim, params.feat_n_layers, params.feat_n_dims, output_func='relu'
+            self.x_input_dim, hparam['feat_n_layers'], hparam['feat_n_dims'], output_func='relu'
             )
 
-        self.hyper_net = LinearNet(params.drug_n_dims, 
-                                    params.drug_n_layers, 
-                                    params.drug_n_dims, 
+        self.hyper_net = LinearNet(hparam['drug_n_dims'], 
+                                    hparam['drug_n_layers'], 
+                                    hparam['drug_n_dims'], 
                                     out_dim = self.feature_net.n_params
                                     )
         
@@ -75,15 +76,15 @@ class HyperTE(nn.Module):
                 )        
 
         self.outcome_net_m = LinearNet(self.feature_net.dim_lst[-1], 
-                            params.pred_n_layers, 
-                            params.pred_n_dims, 
+                            hparam['pred_n_layers'], 
+                            hparam['pred_n_dims'], 
                             out_dim = 1,
                             output_func=None
                             )                    
 
         self.outcome_net_x = LinearNet(self.x_input_dim, 
-                            params.pred_n_layers, 
-                            params.pred_n_dims, 
+                            hparam['pred_n_layers'], 
+                            hparam['pred_n_dims'], 
                             out_dim = 1,
                             output_func=None
                             )   

@@ -62,7 +62,7 @@ class Trainer(BaseTrainer):
         return log
 
         
-    def _infer(self, data_set, reported_by_drug=False):
+    def _infer(self, data_set):
         self.model.eval()
         with torch.no_grad():
             loss = 0
@@ -74,7 +74,7 @@ class Trainer(BaseTrainer):
                 loss += loss_dict['total_loss'].item()       
         loss /= (index+1)
         
-        log = self._metrics_graph(
+        log = self._metrics(
             data_set, y_outs, loss
             )
         
@@ -91,10 +91,10 @@ class Trainer(BaseTrainer):
         for phase, dataset in [('train', self.train_set),
                                 ('val', self.valid_set),
                                 ('test', self.test_set)]:
-            if self.data_type == 'graph' and phase=='test':
+            if phase=='test':
                 sub_log = self.infer_graph_test(dataset)
             else:
-                sub_log = self._infer(dataset, reported_by_drug=True)
+                sub_log = self._infer(dataset)
             log.update({f'{phase}_{k}': v for k, v in sub_log.items()})
         
         self.logger.info('='*100)
@@ -105,7 +105,7 @@ class Trainer(BaseTrainer):
         self.logger.info('='*100)
         return log
     
-    def _metrics_graph(self, data_set, y_outs, loss):
+    def _metrics(self, data_set, y_outs, loss):
         y_outs = y_outs.detach().cpu().numpy().flatten()
         y_trgs = batch_to_arr(data_set, attr_name='y')
         
@@ -183,33 +183,11 @@ class Trainer(BaseTrainer):
                 
         return log
     
-    def _pre_train_epoch(self, epoch):
-        train_loss = 0
-        for index, batch in enumerate(DataLoader(self.train_set, batch_size=self.batch_size, shuffle=False)):
-            batch = self.to_tensor(batch)
-            loss = self.model._pre_train(batch)
-            if index % self.log_step == 0:
-                self.logger.debug(f'Pre-train Epoch: {epoch} {self._progress(index)} Loss: {loss}')
-            train_loss += loss
-        log = {'loss': train_loss/(index+1)}
-        
-        if self.do_validation:
-            val_loss = 0
-            for index, batch in enumerate(DataLoader(self.valid_set, batch_size=self.batch_size, shuffle=False)):
-                batch = self.to_tensor(batch)
-                val_loss += self.model._pre_train_valid(batch)
-            log['val_loss'] = val_loss/(index+1)
-        return log
     
     def to_tensor(self, batch: Batch):
         if isinstance(batch.x, torch.Tensor):
             return batch.to(self.device)
-        if not self.data == 'EHR':
-            batch.covariates = torch.Tensor(batch.covariates).to(self.device)
-        else:
-            covariates, lengths = padding(batch.covariates, self.x_input_dim)
-            batch.covariates = torch.Tensor(covariates).to(self.device)
-            batch.lengths = lengths
+        batch.covariates = torch.Tensor(batch.covariates).to(self.device)
         batch.x = torch.Tensor(np.array(batch.x)).to(self.device)
         batch.y = torch.Tensor(batch.y).to(self.device)
         batch.t = torch.Tensor(batch.t).to(self.device)
@@ -226,159 +204,3 @@ def batch_to_arr(data_set, attr_name='y'):
 
 
             
-'''
-import numpy as np
-import torch
-from .base_trainer import BaseTrainer
-from utils import inf_loop, MetricTracker
-import torch.nn as nn
-import pandas as pd
-
-class Trainer(BaseTrainer):
-    """
-    Trainer class
-    """
-    def __init__(self, model, 
-                      metric_ftns,
-                      config,
-                      train_set,
-                      valid_set,
-                      test_set):
-        super().__init__(model, metric_ftns, config)
-        self.config = config
-        self.batch_size = config["data_loader"]["batch_size"]
-        self.n_train = self.config['data_loader']['n_train']
-        self.is_EHR = (config['data_loader']['data'] == 'Market')
-        self.input_dim = self.model.x_input_dim
-        
-        self.train_set, self.valid_set, self.test_set = train_set, valid_set, test_set
-        self.drug_lst = np.unique(self.train_set['D'])
-        
-        self.train_n_batches = int(np.ceil(float(config["data_loader"]["n_train"]) / float(self.batch_size)))
-        self.valid_n_batches = int(np.ceil(float(config["data_loader"]["n_valid"]) / float(self.batch_size)))
-        self.test_n_batches = int(np.ceil(float(config["data_loader"]["n_test"]) / float(self.batch_size)))
-
-        self.do_validation = self.valid_set is not None
-        self.log_step = 16 
-        self.metrics = MetricTracker('loss', *[m.__name__ for m in self.metric_ftns])
-
-    def _train_epoch(self, epoch):
-        self.model.train()
-        reported_by_drug = (epoch % 10 == 0)
-        y0_outs, y1_outs = [], []
-        for index in range(self.train_n_batches):
-            x, y, t, d_x = self.batch_loader(self.train_set, index)
-            loss, y0_pred, y1_pred = self.model.update(x, y, t, d_x)
-            if index % self.log_step == 0:
-                loss_ = ", ".join([f"{k}: {v.item():.3f}" for k, v in loss.items()])
-                self.logger.debug(f'Train Epoch: {epoch} {self._progress(index)} Loss: {loss_}')
-            y0_outs.append(y0_pred)
-            y1_outs.append(y1_pred)
-        y0_outs, y1_outs = torch.cat(y0_outs).cpu().detach().numpy(), torch.cat(y1_outs).cpu().detach().numpy()
-        
-        self.metrics.reset()
-        self.metrics.update('loss', loss['total_loss'].item())
-        t_trgs, y_trgs, te_trgs, y0_outs, y1_outs = _squeeze(self.train_set['T'], self.train_set['Y'], self.train_set['TE'], y0_outs, y1_outs)
-        for met in self.metric_ftns:
-            self.metrics.update(met.__name__, met(t_trgs, y_trgs, te_trgs, y0_outs, y1_outs))
-        log = self.metrics.result()
-        
-        if reported_by_drug:
-            log.update(self._log_by_drug(self.train_set['D'], t_trgs, y_trgs, te_trgs, y0_outs, y1_outs))
-            
-        if self.do_validation:
-            val_log = self._infer(self.valid_set, self.valid_n_batches, reported_by_drug)
-            log.update(**{'val_' + k: v for k, v in val_log.items()})
-        return log
-
-        
-    def _infer(self, data_set, n_batches, reported_by_drug=False):
-        self.model.eval()
-        with torch.no_grad():
-            y0_outs, y1_outs = [], []
-            for index in range(n_batches):
-                x, y, t, d_x = self.batch_loader(data_set, index)
-                loss, y0_pred, y1_pred = self.model.predict(x, y, t, d_x)
-                y0_outs.append(y0_pred)
-                y1_outs.append(y1_pred)
-        y0_outs, y1_outs = torch.cat(y0_outs).cpu().detach().numpy(), torch.cat(y1_outs).cpu().detach().numpy()
-        
-        self.metrics.reset()
-        self.metrics.update('loss', loss['total_loss'].item())
-        t_trgs, y_trgs, te_trgs, y0_outs, y1_outs = _squeeze(data_set['T'], data_set['Y'], data_set['TE'], y0_outs, y1_outs)
-        for met in self.metric_ftns:
-            self.metrics.update(met.__name__, met(t_trgs, y_trgs, te_trgs, y0_outs, y1_outs))
-        log = self.metrics.result()
-        
-        if reported_by_drug:
-            log.update(self._log_by_drug(data_set['D'], t_trgs, y_trgs, te_trgs, y0_outs, y1_outs))
-        return log
-        
-
-    def _test_epoch(self):
-        if self.save_model:
-            self.model.load_state_dict(torch.load(str(self.checkpoint_dir / 'model_best.pth'))['state_dict'])
-        else:
-            self.model.load_state_dict(self.model_best_params)
-        self.logger.info('Loaded best parameters...')        
-        log = {}
-        for split, dataset, n_batches in [('train', self.train_set, self.train_n_batches),
-                                          ('val', self.valid_set, self.valid_n_batches),
-                                          ('test', self.test_set, self.test_n_batches)]:
-            sub_log = self._infer(dataset, n_batches, True)
-            log.update({f'{split}_{k}': v for k, v in sub_log.items()})
-                
-        self.logger.info('='*100)
-        self.logger.info('Inference Completed')
-        for key, value in log.items():
-            self.logger.info(f'{key:20s}: {value}')
-        self.logger.info('='*100)
-        return log
-
-    def _pre_train_epoch(self, epoch):
-        train_loss = 0
-        for index in range(self.train_n_batches):
-            x, y, t, d_x = self.batch_loader(self.train_set, index)
-            loss = self.model._pre_train(x, y, t, d_x)
-            if index % self.log_step == 0:
-                self.logger.debug(f'Pre-train Epoch: {epoch} {self._progress(index)} Loss: {loss}')
-            train_loss += loss
-        log = {'loss': train_loss/self.train_n_batches}
-        
-        if self.do_validation:
-            val_loss = 0
-            for index in range(self.valid_n_batches):
-                x, y, t, d_x = self.batch_loader(self.train_set, index)
-                val_loss += self.model._pre_train_valid(x, y, t, d_x)
-            log['val_loss'] = val_loss/self.valid_n_batches
-        return log
-    
-    def batch_loader(self, data_set, index):
-        start, end = index * self.batch_size, (index + 1) * self.batch_size
-        x = torch.Tensor(data_set['X'][start:end]).to(self.device)
-        y = torch.Tensor(data_set['Y'][start:end]).to(self.device)
-        t = torch.Tensor(data_set['T'][start:end]).to(self.device)
-        d_x = torch.Tensor(data_set['D_X'][start:end]).to(self.device)
-        return x, y, t, d_x
-    
-    def _log_by_drug(self, d, t_trgs, y_trgs, te_trgs, y0_outs, y1_outs):
-        log = {}
-        for drug in self.drug_lst:
-            self.metrics.reset() 
-            idx = (d == drug)
-            for met in self.metric_ftns:
-                self.metrics.update(met.__name__, met(t_trgs[idx], y_trgs[idx], te_trgs[idx], 
-                                                      y0_outs[idx], y1_outs[idx]))
-            log_by_drug = self.metrics.result()
-            log.update({f'drug_{drug}_{k}': v for k, v in log_by_drug.items() if k != 'loss'})
-        return log
-
-        
-    def _progress(self, batch_idx):
-        current = batch_idx * self.batch_size
-        return f"[{current}/{self.n_train} ({100.0 * current / self.n_train:.0f}%)]"
-                    
-    
-def _squeeze(*arrays):
-    return [np.squeeze(arr) for arr in arrays]
-'''

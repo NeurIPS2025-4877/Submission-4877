@@ -11,7 +11,6 @@ from copy import deepcopy
 class TreatmentFeatureExtractor(nn.Module):
     def __init__(self, 
                  config, 
-                 params, 
                  ):
         super(TreatmentFeatureExtractor, self).__init__()
         hparam = config['hyper_params']
@@ -20,14 +19,14 @@ class TreatmentFeatureExtractor(nn.Module):
         is_hyperTE = hparam['model'].startswith('HyperTE')
         
         if not self.is_graph:
-            self.treatment_net = LinearNet(d_input_dim, params.drug_n_layers, params.drug_n_dims, 
-                                           out_dim=params.drug_n_dims, output_func=hparam['activation'])
+            self.treatment_net = LinearNet(d_input_dim, hparam['drug_n_layers'], hparam['drug_n_dims'], 
+                                           out_dim=hparam['drug_n_dims'], output_func=hparam['activation'])
         else:
             self.treatment_net = GNN( 
                 gnn_conv=hparam['gnn_conv'],
                 dim_input=d_input_dim,
                 dim_hidden=hparam['dim_hidden_treatment'],
-                dim_output=params.drug_n_dims,
+                dim_output=hparam['drug_n_dims'],
                 num_layers=hparam['num_treatment_layer'],
                 batch_norm=hparam['gnn_batch_norm'],
                 initialiser=hparam['initialiser'],
@@ -103,75 +102,3 @@ class LinearNet(nn.Module):
 
 
       
-class BaseModel_NonTreatment(nn.Module):
-    def __init__(self, config, params, outcome_in_dims=None):
-        super(BaseModel_NonTreatment, self).__init__()
-        hparam = config['hyper_params']
-        self.x_input_dim = hparam['x_input_dim']
-        self.d_input_dim = hparam['d_input_dim']
-        self.is_single_outcome = ('lincs' in params.data.lower())
-
-        self.feature_net = LinearNet(self.x_input_dim, params.feat_n_layers, params.feat_n_dims, output_func='relu')
-        
-        if not outcome_in_dims:
-            outcome_in_dims = params.feat_n_dims
-        outcome_net = LinearNet(outcome_in_dims, params.pred_n_layers, params.pred_n_dims, out_dim=1)
-        if self.is_single_outcome:
-            self.outcome_net = nn.ModuleList([deepcopy(outcome_net)])
-        else:
-            self.outcome_net = nn.ModuleList([deepcopy(outcome_net), deepcopy(outcome_net)])
-        del outcome_net
-        self.propensity = LinearNet(outcome_in_dims, params.pred_n_layers, params.pred_n_dims, 
-                                    out_dim=1, output_func='sigmoid')
-
-    def baseloss(self, batch, y_pred, t_pred, alpha=1.0):
-        loss_t = torch.sum(F.binary_cross_entropy(t_pred, batch.t))
-        if self.is_single_outcome:
-            loss_y = torch.sum(torch.square(batch.y - y_pred))
-        else:
-            y0_pred, y1_pred = y_pred[:,0], y_pred[:,1]
-            loss_y = torch.sum((1. - batch.t) * torch.square(batch.y - y0_pred)) +\
-                torch.sum(batch.t * torch.square(batch.y - y1_pred)) 
-        return loss_y + alpha * loss_t
-    
-    def loss_func(self, batch, y_pred, t_pred):
-        return self.baseloss(batch, y_pred, t_pred) 
-    
-    def predict(self, batch: Batch):
-        y_pred, t_pred = self.forward(batch)
-        loss = self.loss_func(batch, y_pred, t_pred)
-        
-        loss_dict = {
-            'total_loss': loss,
-        }
-        return loss_dict, y_pred
-
-    def update(self, batch: Batch):
-        loss, y_pred = self.predict(batch)
-        self.optimizer.zero_grad()
-        loss['total_loss'].backward()
-        self.optimizer.step()
-        return loss, y_pred
-    
-    def forward_outcome(self, input):
-        y_preds = [net(input) for net in self.outcome_net]
-        return torch.cat(y_preds, dim=1)
-    
-    def _last_sequence(self, input, lengths):
-        return input[np.arange(len(input)), lengths-1]
-    
-# class HyperNet(nn.Module):
-#     def __init__(self, input_dim, n_layers, hidden_dim, *dims):
-#         super(HyperNet, self).__init__()
-#         self.dim_sizes = [sum([dims[i][j] * dims[i][j + 1] for j in range(len(dims[i]) - 1)]) for i in range(len(dims))]       
-#         self.weights = LinearNet(input_dim, n_layers, hidden_dim, out_dim=sum(self.dim_sizes))
-        
-#     def forward(self, input):
-#         weights = self.weights(input)
-#         split_weights = []
-#         start = 0
-#         for dim_size in self.dim_sizes:
-#             split_weights.append(weights[:, start:start + dim_size])
-#             start += dim_size
-#         return split_weights
-    
