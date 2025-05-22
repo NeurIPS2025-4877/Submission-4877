@@ -49,13 +49,14 @@ All preprocessed datasets will be saved in the generated_data/ directory.
 For training and evaluating the model, run the following code:
 ```python 
 # Note 1: hyper-parameters are included in config.json.
-python train.py --data 'TCGA'
+python train.py --data 'TCGA' --config 'config/'
 ```
   
 ### Parameters
 **Hyperparameters are set in train.py**
 >
-* `data`: dataset to use; {'TCGA', 'CCLE', 'GDSC'}.<br>
+* `data`: dataset to use. Options: 'TCGA', 'CCLE', 'GDSC'.
+* `config`: path to the directory containing configuration files (e.g., config/TCGA.json).
 
 **Hyperparameters are set in config.json**
 
