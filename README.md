@@ -48,7 +48,7 @@ python train.py --data 'TCGA' --config 'config/'
 **Hyperparameters are set in train.py**
 >
 * `data`: dataset to use. Options: 'TCGA', 'CCLE', 'GDSC'.
-* `config`: path to the directory containing configuration files (e.g., config/TCGA.json).
+* `config`: path to the directory containing configuration files.
 
 **Hyperparameters are set in config.json**
 
