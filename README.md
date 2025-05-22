@@ -59,13 +59,13 @@ python train.py --data 'TCGA'
 
 **Hyperparameters are set in config.json**
 
-data_loader
+"data_loader"
 >
 * `path_to_train`: path to the training data
 * `path_to_test`: path to the test data
 * `valid_ratio`: the ratio of validation
 
-hyper_params
+"hyper_params"
 >
 * `drug_n_dims`: the hidden dimension of the treatment embedding layers.
 * `drug_n_layers`: the number of layers in the treatment embedding.
@@ -78,7 +78,7 @@ hyper_params
 
 _* Note: Additional hyperparameters are defined for configuring the graph neural network modules, and are not listed here._
 
-metrics and trainer
+"metrics" and "trainer"
 >
 * `metrics`: metrics to print out. It is a list format. Functions for all metrics should be included in 'model/metric.py'.
 * `early_stop`: the number of epochs for early stopping
