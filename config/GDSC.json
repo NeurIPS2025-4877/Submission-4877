@@ -1,0 +1,49 @@
+{
+    "n_gpu": 1,
+    "data_loader": {
+        "path_to_train": "generated_data/gdsc/seed-0/bias-1/in_sample.p",
+        "path_to_test": "generated_data/gdsc/seed-0/bias-1/test.p",
+        "path_to_zero": "generated_data/gdsc/zero/seed-0/",
+        "batch_size": 1000,
+        "train_ratio": 0.6,
+        "valid_ratio": 0.2,
+        "data_type": "graph"
+    },
+    "hyper_params": {
+        "x_input_dim": 1014,
+        "d_input_dim": 75,
+        "n_drugs": 238,
+        "gnn_conv": "graph_conv", 
+        "gnn_num_relations": 4,
+        "gnn_num_bases": -1,
+        "gnn_multirelational": false,
+        "dim_hidden_treatment": 50,
+        "num_treatment_layer": 100,
+        "gnn_dropout": 0.0,
+        "activation": "relu",
+        "leaky_relu": 0.1,
+        "gnn_batch_norm": true,
+        "initialiser": "xavier",
+        "independence_regularisation_coeff": 10.0,
+        "min_test_assignments": 2,
+        "max_test_assignments": 10
+    },
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+            "lr": 0.0001
+        }
+    },
+    "metrics": [
+        "MSE", "MAE"
+    ],
+    "trainer": {
+        "epochs": 5000,
+        "save_dir": "saved/",
+        "save_model": false,
+        "save_period": 30,
+        "verbosity": 2,
+        "monitor": "min val_loss",
+        "early_stop": 15
+    }
+}
