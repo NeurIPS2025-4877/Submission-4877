@@ -1,8 +1,8 @@
 {
     "n_gpu": 1,
     "data_loader": {
-        "path_to_train": "generated_data/gdsc/seed-7/bias-0.1/in_sample.p",
-        "path_to_test": "generated_data/gdsc/seed-7/bias-0.1/test.p",
+        "path_to_train": "generated_data/gdsc/seed-0/bias-0.1/in_sample.p",
+        "path_to_test": "generated_data/gdsc/seed-0/bias-0.1/test.p",
         "batch_size": 1000,
         "valid_ratio": 0.2,
         "data_type": "graph"
@@ -12,7 +12,7 @@
         "d_input_dim": 75,
         "n_drugs": 238,
         "drug_n_dims": 50,
-        "drug_n_layers": 2,
+        "drug_n_layers": 1,
         "feat_n_dims": 50,
         "feat_n_layers": 1,
         "pred_n_dims": 50,
